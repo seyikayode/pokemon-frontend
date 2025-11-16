@@ -100,7 +100,7 @@ const PokemonList: React.FC = () => {
 
             {hasMore && (
                 <div className="loader" ref={ref}>
-                    Loading more Pokémon...
+                    Loading more Pokemon...
                 </div>
             )}
 
