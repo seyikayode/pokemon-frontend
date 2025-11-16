@@ -6,7 +6,8 @@ import PokemonDetailModal from './PokemonDetailModal';
 import { useInView } from 'react-intersection-observer';
 import './PokemonList.css';
 
-const BATCH_SIZE = 10;
+const batchSize = import.meta.env.VITE_BATCH_SIZE;
+const formatBatchSize = parseInt(batchSize);
 
 const PokemonList: React.FC = () => {
     const [allPokemon, setAllPokemon] = useState<SimplePokemon[]>([]);
@@ -18,7 +19,8 @@ const PokemonList: React.FC = () => {
 
     const [selectedPokemon, setSelectedPokemon] = useState<string | null>(null);
 
-    const [visibleCount, setVisibleCount] = useState(BATCH_SIZE);
+    // state for infinite scrolling 
+    const [visibleCount, setVisibleCount] = useState(formatBatchSize);
     const { ref, inView } = useInView({
         threshold: 0
     });
@@ -42,7 +44,7 @@ const PokemonList: React.FC = () => {
 
     useEffect(() => {
         if (inView && !loading && !searchTerm && !showOnlyFavorites) {
-            setVisibleCount((prevCount) => prevCount + BATCH_SIZE);
+            setVisibleCount((prevCount) => prevCount + formatBatchSize);
         }
     }, [inView, loading, searchTerm, showOnlyFavorites]);
 
