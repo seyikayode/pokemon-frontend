@@ -1,73 +1,106 @@
-# React + TypeScript + Vite
+PokéManager - Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This is the frontend client for the PokéManager application. It is a responsive single-page application built with React and Vite that allows users to browse and manage their favorite Pokémon.
 
-Currently, two official plugins are available:
+This application is purely a client. It is 100% stateless and relies on the backend API for all data fetching and persistence.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Features
 
-## React Compiler
+Virtual Infinite Scrolling: Fetches all 150 Pokémon at once (from the fast backend cache) but renders only the visible ones, allowing for smooth scrolling without pagination.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Detailed Modals: Users can click any Pokémon to view a modal with its types, abilities, and full evolution chain.
 
-## Expanding the ESLint configuration
+Client-Side Search: A live search bar filters the Pokémon list instantly.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+Favorite Filtering: A checkbox allows users to see only their favorited Pokémon.
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+Persistent Favorites: Users can add or remove Pokémon from their favorites. This state is managed through React Context and synced with the backend API, so it persists between sessions.
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+Responsive Design: The application is usable on all devices, from mobile phones to desktops.
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+Unit Tested: Includes unit tests for the main PokemonList component to verify filtering and API mocking.
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Tech Stack
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+Framework: React 18
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+Bundler: Vite
+
+Language: TypeScript
+
+Styling: CSS Modules (plain CSS)
+
+State Management: React Context
+
+API Client: Axios
+
+Infinite Scroll: react-intersection-observer
+
+Testing: Vitest & React Testing Library
+
+Architecture
+
+This application is built around a central PokemonList component which handles all major logic:
+
+Data Fetching: On load, it calls the getPokemonList function from src/api.ts to fetch the main list.
+
+Filtering: useMemo hooks are used to create the list of Pokémon to display. This list is derived from the main list and filtered by the searchTerm and showOnlyFavorites states.
+
+State Management: The global list of favorites is managed in FavoritesContext. When a user clicks a "favorite" button, the context calls the backend API and updates its own state, causing the app to re-render.
+
+Virtual Scrolling: The useInView hook tracks a "loader" element at the bottom of the list. When it becomes visible, the component increases the visibleCount state, which slices a larger portion of the main list to be rendered.
+
+API Abstraction: All axios calls are kept in a single src/api.ts file. This file reads its base URL from the environment variables, making it easy to switch between local and production backends.
+
+Local Setup and Testing
+
+Prerequisites
+
+Node.js (v18 or later)
+
+NPM
+
+The backend API must be running locally (on http://localhost:3001) before starting the frontend.
+
+1. Install and Run the App
+
+Clone the repository:
+
+git clone https://github.com/seyikayode/pokemon-frontend.git
+cd pokemon-frontend
+
+
+Install dependencies:
+
+npm install
+
+
+Create your environment file:
+Copy the example file.
+
+cp .env.example .env
+
+
+The default VITE_API_URL points to http://localhost:3001/api, which is correct for local development.
+
+Run the application in development mode:
+
+npm run dev
+
+
+The application will now be running on http://localhost:5137.
+
+How to Run Tests
+
+Run the full Vitest test suite to check all components.
+
+npm run test
+
+
+Environment Variables
+
+These variables are required. Copy them from .env.example to a new .env file.
+
+# The full URL to the backend API
+VITE_API_URL=http://localhost:3001/api
+VITE_BATCH_SIZE=10
